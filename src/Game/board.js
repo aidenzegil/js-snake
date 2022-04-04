@@ -18,8 +18,8 @@ const style = {
     justifyContent: 'center'
 }
 
-const boardRows = width / 20
-const boardCols = height / 20
+// const boardRows = width / 20
+// const boardCols = height / 20
 
 const Board = ({ squares }) => {
 
