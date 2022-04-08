@@ -1,47 +1,72 @@
 import { useState, useEffect } from "react";
 import Board from "./board";
-import { numOfSquares, boardCols } from "../Utils/utility";
-// import { changePosition } from "./snakeFunctions";
+import { numOfSquares, boardCols, boardRows } from "../Utils/utility";
 
 const Game = () => {
-  const [direction, setDirection] = useState(null);
-  const [grid, setGrid] = useState(Array(numOfSquares).fill(null)); //fills an array the size of the game board with null
+  //initial direction
+  const [direction, setDirection] = useState("movingRight");
+  //fills an array the size of the game board with null
+  const [grid, setGrid] = useState(Array(numOfSquares).fill(null));
+  //array to keep track of snake length
   const [snake, setSnake] = useState(Array(1).fill(null));
+
   const [score, setScore] = useState(3);
 
+  // Everything needed for game start
   function startGame() {
     if (grid.indexOf(5) === -1) {
       const startGrid = [...grid];
-      console.log(snake);
       appleSpawn(startGrid);
       startGrid[0] = 5;
       setGrid(startGrid);
-      console.log(grid);
     } else {
-      console.log(grid);
       alert("Game Already Started");
     }
   }
 
-  // function endConditions(fromIndex, toIndex) {
-  //   //bounds
+  //restores default states
+  const reset = () => {
+    setGrid(Array(numOfSquares).fill(null));
+    setSnake(Array(1).fill(null));
+    setScore(3);
+    setDirection("movingRight");
+  };
 
-  // }
 
-  function appleSpawn(grid) {
-    const randomSpawn = Math.floor(Math.random() * numOfSquares);
-    grid[randomSpawn] = 0;
+  function endConditions(fromIndex, toIndex) {
+    for (var i = 0; i < boardRows; i++) {
+      if (
+        (fromIndex === i * boardCols - 1 && toIndex === i * boardCols) || // crosses edge going right
+        (fromIndex === i * boardCols && toIndex === i * boardCols - 1) || // crosses edge going left
+        toIndex > numOfSquares - 1 || // crosses edge going down
+        grid[toIndex] === 3 || // crosses snake body
+        toIndex < 0 // crosses edge going up
+      ) {
+        alert("Game Over!");
+        reset();
+        return true;
+      }
+    }
   }
 
+  // spawns apple in an unoccupied spot
+  function appleSpawn(array) {
+    const randomSpawn = Math.floor(Math.random() * numOfSquares);
+    if (array[randomSpawn] != null) appleSpawn(array)
+    else array[randomSpawn] = 0;
+  }
+
+  // checks to see if an apple has been eaten
   const appleEaten = () => {
     if (grid.indexOf(0) === -1) {
       appleSpawn(grid);
-      const newScore = score + 1;
+      const newScore = score + 3;
       setScore(newScore);
       console.log("Apple Eaten! Your New Score Is ", newScore);
     } else return;
   };
 
+  // maintains snake length based on score 
   function maintainLength() {
     if (snake.length < score) return;
     else {
@@ -51,104 +76,84 @@ const Game = () => {
     }
   }
 
-  // function updateBoard(snakeArr, boardArr, toIndex, fromIndex) {
-  //   snakeArr.push(fromIndex)
-  //   boardArr[toIndex] = 5
-  //   boardArr[fromIndex]= 3
-  //   setSnake(snakeArr)
-  //   setGrid(boardArr)
-  // }
-  // updateBoard(newSnake, newGrid, oldIndex, newIndex)
-
-  const movingRight = (newGrid, newSnake) => {
-    const oldIndex = newGrid.indexOf(5);
-    const newIndex = newGrid.indexOf(5) + 1;
-    newSnake.push(oldIndex);
-    newGrid[newIndex] = 5;
-    newGrid[oldIndex] = 3;
-    setSnake(newSnake);
-    setGrid(newGrid);
-  };
-  const movingLeft = (newGrid, newSnake) => {
-    const oldIndex = newGrid.indexOf(5);
-    newGrid[newGrid.indexOf(5) - 1] = 5;
-    newSnake.push(oldIndex);
-    newGrid[oldIndex] = 3;
-    setSnake(newSnake);
-    setGrid(newGrid);
-  };
-  const movingUp = (newGrid, newSnake) => {
-    const oldIndex = newGrid.indexOf(5);
-    newGrid[newGrid.indexOf(5) - boardCols] = 5;
-    newSnake.push(oldIndex);
-    newGrid[oldIndex] = 3;
-    setSnake(newSnake);
-    setGrid(newGrid);
-  };
-  const movingDown = (newGrid, newSnake) => {
-    const oldIndex = newGrid.indexOf(5);
-    newGrid[newGrid.indexOf(5) + boardCols] = 5;
-    newSnake.push(oldIndex);
-    newGrid[oldIndex] = 3;
-    setSnake(newSnake);
-    setGrid(newGrid);
-  };
-
+  // bulk of functionality 
   function autoMove() {
+    // first makes sure snake length coincides with score
     maintainLength();
+
+    // checks if apple was eaten during the last interval
     appleEaten();
+    
     const newGrid = [...grid];
+
     const newSnake = [...snake];
-    console.log("autoMove function called");
-    if (grid.indexOf(5) === -1) return;
-    else if (direction === "movingRight") {
-      movingRight(newGrid, newSnake);
+
+    const oldIndex = newGrid.indexOf(5);
+
+    // repetitive code turned into a function
+    function necessaryUpdates(newIndex) {
+      newSnake.push(oldIndex);
+      newGrid[newIndex] = 5;
+      newGrid[oldIndex] = 3;
+      setSnake(newSnake);
+      setGrid(newGrid);
+      endConditions(oldIndex, newIndex);
+    }
+
+    // makes move based on the state of direction
+    if (direction === "movingRight") {
+      const newIndex = newGrid.indexOf(5) + 1;
+      necessaryUpdates(newIndex);
     } else if (direction === "movingLeft") {
-      movingLeft(newGrid, newSnake);
+      const newIndex = newGrid.indexOf(5) - 1;
+      necessaryUpdates(newIndex);
     } else if (direction === "movingDown") {
-      movingDown(newGrid, newSnake);
+      const newIndex = newGrid.indexOf(5) + boardCols;
+      necessaryUpdates(newIndex);
     } else if (direction === "movingUp") {
-      movingUp(newGrid, newSnake);
+      const newIndex = newGrid.indexOf(5) - boardCols;
+      necessaryUpdates(newIndex);
     } else return;
   }
-  // useEffect( () => {
-  //   const interval = setInterval(() => {
-  //    console.log(direction)
-  //    setGrid(autoMove(grid))
-  //    return () => clearInterval(interval)
-  //   }, 2000)
-  // }, [])
 
+  // interval 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (grid.indexOf(5) === -1) {
+        return;
+      } else {
+        autoMove();
+      }
+    }, 90);
+    return () => {
+      clearInterval(interval);
+    };
+  });
+
+
+  // changes direction based on key pressed
   document.onkeydown = function changeDirection(e) {
     const keyPress = e.key;
     console.log(keyPress);
-    if (keyPress === "a" && direction !== "movingRight") {
+    if (grid.indexOf(5) === -1) return;
+    else if ((keyPress === "a") && direction !== "movingRight") {
       setDirection("movingLeft");
-      autoMove();
-    } else if (keyPress === "d" && direction !== "movingLeft") {
+    } else if ((keyPress === "d" )&& direction !== "movingLeft") {
       setDirection("movingRight");
-      autoMove();
-    } else if (keyPress === "s" && direction !== "movingUp") {
+    } else if ((keyPress === "s" )&& direction !== "movingUp") {
       setDirection("movingDown");
-      autoMove();
-    } else if (keyPress === "w" && direction !== "movingDown") {
+    } else if ((keyPress === "w")&& direction !== "movingDown") {
       setDirection("movingUp");
-      autoMove();
     } else {
       return;
     }
   };
 
-  // function handleClick() {
-  //     console.log(NumOfSquares)
-  //     console.log(boardCols)
-  //     console.log(height)
-  // }
-
   return (
     <div>
       <Board squares={grid} />
       <button onClick={startGame}>Start</button>
+      <button onClick={reset}>Reset</button>
       <p>Score: {score}</p>
     </div>
   );
