@@ -25,9 +25,13 @@ export default function useWindowDimensions() {
 
 
   const {width, height} = getWindowDimensions()
-  const boardRows = Math.floor((height * .9)/20)
-  const boardCols = Math.floor((width * .9)/20)
-  const NumOfSquares = boardRows * boardCols //determines number of squares on board based on window dimensions
-  console.log(width)
-console.log(boardCols)
-export {useWindowDimensions, NumOfSquares, boardRows, boardCols, width, height}
+  const boardRows = Math.floor((height * .8)/20)
+  const boardCols = Math.floor((width * .8)/20)
+  const numOfSquares = boardRows * boardCols //determines number of squares on board based on window dimensions
+
+
+console.log(width, height, boardRows, numOfSquares)
+
+
+
+export {useWindowDimensions, numOfSquares, boardRows, boardCols, width, height}

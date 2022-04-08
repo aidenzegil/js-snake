@@ -7,10 +7,18 @@ const style = {
     display: 'flex',
     flexWrap: 'wrap',
 }
+const fill = {
+    width: '20px',
+    height: '20px',
+    border: '1px solid',
+    display: 'flex',
+    flexWrap: 'wrap',
+    backgroundColor: 'black'
+}
 
 const Square = ({value}) => {
   return (
-    <div style={style} className='square'>
+    <div style={value ? fill : style}>
       {value}
     </div>
   );
