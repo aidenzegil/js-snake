@@ -1,12 +1,6 @@
 import Square from "./square";
 import { boardCols, boardRows } from "../Utils/utility";
 
-const container = {
-  justifyContent: "center",
-  display: "flex",
-  flexWrap: "wrap",
-};
-
 const style = {
   width: boardCols * 22,
   height: boardRows * 22,
@@ -18,7 +12,7 @@ const style = {
 
 const Board = ({ squares }) => {
   return (
-    <div style={container}>
+    <div className="boardContainer">
       <div style={style}>
         {squares.map((square, i) => (
           <Square key={i} value={square} />
