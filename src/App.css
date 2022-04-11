@@ -1,6 +1,19 @@
+
+
 .app {
   text-align: center;
   background-color: gray;
 }
 
 
+.test {
+  width:100px;
+  height:100px;
+  background-color: aquamarine;
+}
+
+.boardContainer {
+  justify-content: center;
+  display: flex;
+  flex-wrap: wrap;
+}

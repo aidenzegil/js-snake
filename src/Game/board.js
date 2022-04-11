@@ -1,36 +1,25 @@
 import Square from "./square";
-import {useWindowDimensions} from '../Utils/utility'
-
-const {width, height} = useWindowDimensions
-
-const container = {
-    justifyContent: 'center',
-    display: 'flex',
-    flexWrap: 'wrap',
-}
+import { boardCols, boardRows } from "../Utils/utility";
 
 const style = {
-    width: ((useWindowDimensions.width) * 0.9),
-    height: ((useWindowDimensions.height) * 0.9),
-    border: '1px solid',
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'center'
-}
-
-// const boardRows = width / 20
-// const boardCols = height / 20
+  width: boardCols * 22,
+  height: boardRows * 22,
+  border: "1px solid",
+  display: "flex",
+  flexWrap: "wrap",
+  justifyContent: "center",
+};
 
 const Board = ({ squares }) => {
-
-return(
-    <div style = {container}>
-    <div style={style}>
-    {squares.map((square, i) => (
-      <Square key={i} value={square} />
-    ))}
-  </div>
-  </div>
-)};
+  return (
+    <div className="boardContainer">
+      <div style={style}>
+        {squares.map((square, i) => (
+          <Square key={i} value={square} />
+        ))}
+      </div>
+    </div>
+  );
+};
 
 export default Board;
